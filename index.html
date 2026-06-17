@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kix</title>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Poppins:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+
+/* ── TOKENS ── */
+:root {
+  --cream:   #F7F3EE;
+  --yellow:  #F9E87A;
+  --green:   #C5E8C0;
+  --blue:    #C2DCEF;
+  --pink:    #F5C6D8;
+  --peach:   #F7D4B5;
+  --lilac:   #DDD0F0;
+
+  --ink:     #1E1B18;
+  --ink2:    #5A564F;
+  --ink3:    #9E9A93;
+  --white:   #FFFFFF;
+  --border:  rgba(30,27,24,0.10);
+  --border2: rgba(30,27,24,0.16);
+
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 999px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #EDE8E2;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCREEN NAV (dev helper) ── */
+.screen-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.snav-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.snav-btn.active, .snav-btn:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ── PHONE SHELL ── */
+.phone {
+  width: 390px;
+  min-height: 700px;
+  background: var(--cream);
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(30,27,24,0.18), 0 2px 8px rgba(30,27,24,0.08);
+  position: relative;
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ── NAV BAR ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  background: var(--cream);
+}
+.logo {
+  font-family: 'Bagel Fat One', cursive;
+  font-size: 26px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-outline-sm {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-full);
+  padding: 6px 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-outline-sm:hover { background: var(--ink); color: var(--white); }
+.btn-solid-sm {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--white);
+  background: var(--ink);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--r-full);
+  padding: 6px 14px;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: opacity 0.15s;
+}
+.btn-solid-sm:hover { opacity: 0.8; }
+
+/* ── SEARCH + FILTER ── */
+.search-area {
+  padding: 0 20px 16px;
+}
+.search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-full);
+  padding: 10px 16px;
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  background: transparent;
+}
+.search-box input::placeholder { color: var(--ink3); }
+.search-box .ph { color: var(--ink3); font-size: 16px; }
+
+.filter-btn {
+  width: 40px; height: 40px;
+  border-radius: var(--r-full);
+  background: var(--ink);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.filter-btn i { color: var(--white); font-size: 18px; }
+
+.chips-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.chips-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--border2);
+  background: var(--white);
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.chip.on { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.chip:hover:not(.on) { border-color: var(--ink); color: var(--ink); }
+
+/* ── RESULTS LABEL ── */
+.results-label {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink3);
+  padding: 0 20px 10px;
+  letter-spacing: 0.02em;
+}
+
+/* ── CARDS LIST ── */
+.cards-list {
+  padding: 0 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── SPACE CARD ── */
+.space-card {
+  background: var(--white);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.space-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(30,27,24,0.10);
+}
+
+.card-accent {
+  height: 6px;
+  width: 100%;
+}
+.accent-yellow { background: var(--yellow); }
+.accent-green  { background: var(--green); }
+.accent-blue   { background: var(--blue); }
+.accent-pink   { background: var(--pink); }
+.accent-lilac  { background: var(--lilac); }
+
+.card-body {
+  padding: 14px 16px 0;
+}
+
+/* sport tags row */
+.sport-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.sport-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-full);
+  padding: 4px 10px 4px 7px;
+}
+.sport-tag i { font-size: 13px; color: var(--ink2); }
+
+.card-name {
+  font-family: 'Bagel Fat One', cursive;
+  font-size: 20px;
+  color: var(--ink);
+  line-height: 1.15;
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.card-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 12px;
+}
+.card-location {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  color: var(--ink3);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.card-location i { font-size: 11px; }
+.card-contact {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  color: var(--ink2);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-contact i { font-size: 12px; }
+
+.card-footer {
+  border-top: 1.5px solid var(--border);
+  padding: 10px 0;
+}
+.btn-ver {
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: gap 0.15s;
+}
+.btn-ver:hover { gap: 10px; }
+.btn-ver i { font-size: 14px; }
+
+/* ── FORMULARIO ALTA ── */
+.form-screen {
+  padding: 0 0 40px;
+}
+.form-header {
+  padding: 24px 24px 20px;
+  background: var(--yellow);
+}
+.form-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding: 0;
+}
+.form-back i { font-size: 16px; }
+.form-title {
+  font-family: 'Bagel Fat One', cursive;
+  font-size: 26px;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+.form-subtitle {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 11px;
+  color: var(--ink2);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.form-body {
+  padding: 24px 20px 0;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+.field-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink2);
+  margin-bottom: 6px;
+  display: block;
+}
+.field-input {
+  width: 100%;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.field-input:focus { border-color: var(--ink); }
+.field-input::placeholder { color: var(--ink3); }
+.field-hint {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  color: var(--ink3);
+  margin-top: 5px;
+  display: block;
+}
+.field-row {
+  display: flex;
+  gap: 10px;
+}
+.field-row .field { flex: 1; }
+
+/* password toggle */
+.field-input-wrap {
+  position: relative;
+}
+.field-input-wrap .field-input {
+  padding-right: 42px;
+}
+.pwd-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink3);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.divider-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+.divider-text span {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  color: var(--ink3);
+  white-space: nowrap;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border2);
+}
+
+.btn-main {
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--ink);
+  border: none;
+  border-radius: var(--r-full);
+  padding: 15px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+  margin-top: 8px;
+}
+.btn-main:hover { opacity: 0.85; transform: translateY(-1px); }
+
+.form-footer-note {
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 10px;
+  color: var(--ink3);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.6;
+}
+.form-footer-note a {
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ── STEPPER ── */
+.stepper {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px 0;
+  gap: 0;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.step-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink3);
+  position: relative;
+  z-index: 1;
+}
+.step-circle.done {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--ink);
+}
+.step-circle.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+.step-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink3);
+  text-align: center;
+}
+.step-label.active { color: var(--ink); }
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border2);
+  margin-bottom: 16px;
+}
+.step-line.done { background: var(--green); }
+
+/* ── SELECT ── */
+.field-select {
+  width: 100%;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.field-select:focus { border-color: var(--ink); }
+
+/* ── TEXTAREA ── */
+.field-textarea {
+  width: 100%;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  outline: none;
+  resize: none;
+  transition: border-color 0.15s;
+  line-height: 1.5;
+}
+.field-textarea:focus { border-color: var(--ink); }
+.field-textarea::placeholder { color: var(--ink3); }
+
+/* sport tag picker */
+.sport-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.sport-pick-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 7px 12px 7px 9px;
+  border-radius: var(--r-full);
+  border: 1.5px solid var(--border2);
+  background: var(--white);
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sport-pick-item i { font-size: 14px; }
+.sport-pick-item.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+.sport-pick-item.on i { color: var(--white); }
+
+/* section group */
+.form-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  margin-bottom: 14px;
+  margin-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid var(--border);
+}
+
+/* header colors for form steps */
+.header-green  { background: var(--green); }
+.header-blue   { background: var(--blue); }
+.header-pink   { background: var(--pink); }
+
+/* nav buttons row */
+.form-nav-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  padding-bottom: 4px;
+}
+.btn-back-form {
+  flex: 1;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-full);
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.btn-back-form:hover { border-color: var(--ink); }
+.btn-next-form {
+  flex: 2;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--ink);
+  border: none;
+  border-radius: var(--r-full);
+  padding: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-next-form:hover { opacity: 0.85; }
+
+/* horario row */
+.horario-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.horario-day {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink2);
+  width: 36px;
+  flex-shrink: 0;
+}
+.horario-input {
+  flex: 1;
+  font-family: 'Montserrat Alternates', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border2);
+  border-radius: var(--r-md);
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.horario-input:focus { border-color: var(--ink); }
+.horario-sep {
+  font-size: 11px;
+  color: var(--ink3);
+  flex-shrink: 0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV SCREENS -->
+<div class="screen-nav">
+  <button class="snav-btn active" onclick="go('home')">1 · Home</button>
+  <button class="snav-btn" onclick="go('alta')">2 · Alta usuario</button>
+  <button class="snav-btn" onclick="go('form1')">3a · Formulario paso 1</button>
+  <button class="snav-btn" onclick="go('form2')">3b · Formulario paso 2</button>
+  <button class="snav-btn" onclick="go('form3')">3c · Formulario paso 3</button>
+</div>
+
+<div class="phone">
+
+<!-- ══════════════════════════════════════
+     SCREEN 1 · HOME
+══════════════════════════════════════ -->
+<div class="screen active" id="s-home">
+
+  <!-- topbar -->
+  <div class="topbar">
+    <span class="logo">Kix</span>
+    <div class="topbar-actions">
+      <button class="btn-outline-sm" onclick="go('alta')">Ingresar</button>
+      <button class="btn-solid-sm" onclick="go('alta')">Sumá tu espacio</button>
+    </div>
+  </div>
+
+  <!-- search -->
+  <div class="search-area">
+    <div class="search-row">
+      <div class="search-box">
+        <i class="ph ph-magnifying-glass" style="font-size:16px;color:var(--ink3)"></i>
+        <input placeholder="Barrio o ciudad...">
+      </div>
+      <button class="filter-btn">
+        <i class="ph ph-funnel"></i>
+      </button>
+    </div>
+    <div class="chips-row">
+      <span class="chip on" onclick="toggleChip(this)">Todos</span>
+      <span class="chip" onclick="toggleChip(this)"><i class="ph ph-soccer-ball" style="font-size:11px;margin-right:2px"></i>Fútbol</span>
+      <span class="chip" onclick="toggleChip(this)">Vóley</span>
+      <span class="chip" onclick="toggleChip(this)">Natación</span>
+      <span class="chip" onclick="toggleChip(this)">Danza</span>
+      <span class="chip" onclick="toggleChip(this)">Rugby</span>
+      <span class="chip" onclick="toggleChip(this)">Muay Thai</span>
+    </div>
+  </div>
+
+  <p class="results-label">8 espacios encontrados</p>
+
+  <div class="cards-list">
+
+    <!-- Card 1 -->
+    <div class="space-card">
+      <div class="card-accent accent-yellow"></div>
+      <div class="card-body">
+        <div class="sport-tags">
+          <span class="sport-tag"><i class="ph ph-volleyball"></i>Vóley</span>
+          <span class="sport-tag"><i class="ph ph-soccer-ball"></i>Fútbol</span>
+          <span class="sport-tag"><i class="ph ph-boxing-glove"></i>Muay Thai</span>
+          <span class="sport-tag"><i class="ph ph-rugby-ball"></i>Rugby</span>
+        </div>
+        <p class="card-name">Ciervos Pampas Rugby Club</p>
+
+        <div class="card-details">
+          <span class="card-location"><i class="ph ph-map-pin"></i>Cerrito 445, Centro</span>
+          <span class="card-contact"><i class="ph ph-phone"></i>+54 11 2234 9810</span>
+        </div>
+      </div>
+      <div class="card-footer" style="padding: 10px 16px">
+        <button class="btn-ver">Ver espacio <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="space-card">
+      <div class="card-accent accent-blue"></div>
+      <div class="card-body">
+        <div class="sport-tags">
+          <span class="sport-tag"><i class="ph ph-volleyball"></i>Vóley</span>
+        </div>
+        <p class="card-name">Espacio Común Palermo</p>
+        <div class="card-details">
+          <span class="card-location"><i class="ph ph-map-pin"></i>Palermo, CABA</span>
+          <span class="card-contact"><i class="ph ph-instagram-logo"></i>@espaciocomun</span>
+        </div>
+      </div>
+      <div class="card-footer" style="padding: 10px 16px">
+        <button class="btn-ver">Ver espacio <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="space-card">
+      <div class="card-accent accent-pink"></div>
+      <div class="card-body">
+        <div class="sport-tags">
+          <span class="sport-tag"><i class="ph ph-boxing-glove"></i>Muay Thai</span>
+          <span class="sport-tag"><i class="ph ph-rugby-ball"></i>Rugby</span>
+        </div>
+        <p class="card-name">Gimnasio Plural</p>
+        <div class="card-details">
+          <span class="card-location"><i class="ph ph-map-pin"></i>Almagro, CABA</span>
+          <span class="card-contact"><i class="ph ph-envelope-simple"></i>info@plural.com</span>
+        </div>
+      </div>
+      <div class="card-footer" style="padding: 10px 16px">
+        <button class="btn-ver">Ver espacio <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="space-card">
+      <div class="card-accent accent-green"></div>
+      <div class="card-body">
+        <div class="sport-tags">
+          <span class="sport-tag"><i class="ph ph-rugby-ball"></i>Rugby</span>
+        </div>
+        <p class="card-name">Centro Deportivo Sur</p>
+        <div class="card-details">
+          <span class="card-location"><i class="ph ph-map-pin"></i>Boedo, CABA</span>
+          <span class="card-contact"><i class="ph ph-phone"></i>+54 11 4455 7890</span>
+        </div>
+      </div>
+      <div class="card-footer" style="padding: 10px 16px">
+        <button class="btn-ver">Ver espacio <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="space-card">
+      <div class="card-accent accent-lilac"></div>
+      <div class="card-body">
+        <div class="sport-tags">
+          <span class="sport-tag"><i class="ph ph-volleyball"></i>Vóley</span>
+          <span class="sport-tag"><i class="ph ph-soccer-ball"></i>Fútbol</span>
+          <span class="sport-tag"><i class="ph ph-rugby-ball"></i>Rugby</span>
+        </div>
+        <p class="card-name">Club La Marea</p>
+        <div class="card-details">
+          <span class="card-location"><i class="ph ph-map-pin"></i>Villa Crespo, CABA</span>
+          <span class="card-contact"><i class="ph ph-instagram-logo"></i>@clublamarea</span>
+        </div>
+      </div>
+      <div class="card-footer" style="padding: 10px 16px">
+        <button class="btn-ver">Ver espacio <i class="ph ph-arrow-right"></i></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 2 · ALTA DE USUARIO
+══════════════════════════════════════ -->
+<div class="screen" id="s-alta">
+  <div class="form-screen">
+
+    <div class="form-header header-yellow" style="background:var(--yellow)">
+      <button class="form-back" onclick="go('home')">
+        <i class="ph ph-arrow-left"></i> Volver
+      </button>
+      <h1 class="form-title">Registrá tu espacio</h1>
+      <p class="form-subtitle">Creá tu cuenta para sumarte al mapa de Kix.</p>
+    </div>
+
+    <div class="form-body">
+
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" placeholder="hola@miespacio.com">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Contraseña</label>
+        <div class="field-input-wrap">
+          <input class="field-input" type="password" placeholder="Mínimo 8 caracteres">
+          <button class="pwd-toggle"><i class="ph ph-eye"></i></button>
+        </div>
+        <span class="field-hint">Usá letras, números y al menos un símbolo.</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Tu nombre</label>
+        <input class="field-input" type="text" placeholder="Nombre y apellido">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Nombre del espacio, organización o persona</label>
+        <input class="field-input" type="text" placeholder="Ej: Club La Marea">
+        <span class="field-hint">Así va a aparecer en el mapa.</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Ubicación</label>
+        <div class="field-row">
+          <div class="field">
+            <select class="field-select">
+              <option value="" disabled selected>Provincia</option>
+              <option>Buenos Aires</option>
+              <option>CABA</option>
+              <option>Córdoba</option>
+              <option>Rosario</option>
+            </select>
+          </div>
+          <div class="field">
+            <input class="field-input" type="text" placeholder="Ciudad">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-main" onclick="go('form1')">Crear cuenta →</button>
+
+      <p class="form-footer-note">
+        Al registrarte aceptás los <a>términos de uso</a> y la <a>política de privacidad</a> de Kix.<br><br>
+        ¿Ya tenés cuenta? <a onclick="go('home')">Ingresá acá</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3A · FORMULARIO ESPACIO — PASO 1
+══════════════════════════════════════ -->
+<div class="screen" id="s-form1">
+  <div class="form-screen">
+
+    <div class="form-header header-green">
+      <button class="form-back" onclick="go('alta')">
+        <i class="ph ph-arrow-left"></i> Volver
+      </button>
+      <h1 class="form-title">Tu espacio</h1>
+      <p class="form-subtitle">Completá los datos que van a aparecer en el mapa.</p>
+    </div>
+
+    <!-- stepper -->
+    <div class="stepper">
+      <div class="step-item">
+        <div class="step-circle active">1</div>
+        <span class="step-label active">Datos</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">2</div>
+        <span class="step-label">Deportes</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">3</div>
+        <span class="step-label">Contacto</span>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <div class="field">
+        <label class="field-label">Nombre del espacio</label>
+        <input class="field-input" type="text" placeholder="Ej: Club La Marea">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Tipo de espacio</label>
+        <select class="field-select">
+          <option value="" disabled selected>Seleccioná una opción</option>
+          <option>Club barrial</option>
+          <option>Gimnasio</option>
+          <option>Espacio comunitario</option>
+          <option>Profe independiente</option>
+          <option>Colectivo</option>
+          <option>Espacio autogestivo</option>
+          <option>Otro</option>
+        </select>
+      </div>
+
+      <p class="form-section-title">Dirección</p>
+
+      <div class="field">
+        <label class="field-label">País</label>
+        <select class="field-select">
+          <option selected>Argentina</option>
+        </select>
+      </div>
+
+      <div class="field-row" style="margin-bottom:16px">
+        <div class="field">
+          <label class="field-label">Provincia</label>
+          <select class="field-select">
+            <option value="" disabled selected>Provincia</option>
+            <option>Buenos Aires</option>
+            <option>CABA</option>
+            <option>Córdoba</option>
+            <option>Santa Fe</option>
+            <option>Mendoza</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Ciudad</label>
+          <input class="field-input" type="text" placeholder="Ciudad">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Calle y número</label>
+        <input class="field-input" type="text" placeholder="Ej: Av. Corrientes 1234">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Código postal</label>
+        <input class="field-input" type="text" placeholder="Ej: C1043">
+      </div>
+
+      <p class="form-section-title">Más info</p>
+
+      <div class="field">
+        <label class="field-label">Descripción breve <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <textarea class="field-textarea" rows="3" placeholder="Contá brevemente qué hace especial a tu espacio..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Red social <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input class="field-input" type="text" placeholder="@tuespacio">
+      </div>
+
+      <div class="form-nav-row">
+        <button class="btn-next-form" onclick="go('form2')">Siguiente →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3B · FORMULARIO ESPACIO — PASO 2
+══════════════════════════════════════ -->
+<div class="screen" id="s-form2">
+  <div class="form-screen">
+
+    <div class="form-header header-blue">
+      <button class="form-back" onclick="go('form1')">
+        <i class="ph ph-arrow-left"></i> Paso 1
+      </button>
+      <h1 class="form-title">Deportes y actividades</h1>
+      <p class="form-subtitle">¿Qué se hace en tu espacio?</p>
+    </div>
+
+    <!-- stepper -->
+    <div class="stepper">
+      <div class="step-item">
+        <div class="step-circle done"><i class="ph ph-check" style="font-size:13px"></i></div>
+        <span class="step-label">Datos</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step-item">
+        <div class="step-circle active">2</div>
+        <span class="step-label active">Deportes</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle">3</div>
+        <span class="step-label">Contacto</span>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <div class="field">
+        <label class="field-label">Deportes que se practican</label>
+        <p class="field-hint" style="margin-bottom:10px">Seleccioná todos los que correspondan.</p>
+        <div class="sport-picker">
+          <span class="sport-pick-item on" onclick="toggleSport(this)"><i class="ph ph-soccer-ball"></i>Fútbol</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)"><i class="ph ph-volleyball"></i>Vóley</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">Natación</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)"><i class="ph ph-boxing-glove"></i>Muay Thai</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)"><i class="ph ph-rugby-ball"></i>Rugby</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">Danza</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">Yoga</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">Atletismo</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">Paddle</span>
+          <span class="sport-pick-item" onclick="toggleSport(this)">+ Otro</span>
+        </div>
+      </div>
+
+      <p class="form-section-title">Actividades</p>
+
+      <div class="field">
+        <label class="field-label">Descripción de actividades <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <textarea class="field-textarea" rows="3" placeholder="Ej: Clases abiertas de fútbol los jueves, torneos mensuales mixtos..."></textarea>
+      </div>
+
+      <p class="form-section-title">Horarios generales</p>
+
+      <div class="horario-row">
+        <span class="horario-day">Lun–Vie</span>
+        <input class="horario-input" type="text" placeholder="09:00">
+        <span class="horario-sep">a</span>
+        <input class="horario-input" type="text" placeholder="21:00">
+      </div>
+      <div class="horario-row">
+        <span class="horario-day">Sábado</span>
+        <input class="horario-input" type="text" placeholder="10:00">
+        <span class="horario-sep">a</span>
+        <input class="horario-input" type="text" placeholder="18:00">
+      </div>
+      <div class="horario-row">
+        <span class="horario-day">Domingo</span>
+        <input class="horario-input" type="text" placeholder="Cerrado">
+        <span class="horario-sep">a</span>
+        <input class="horario-input" type="text" placeholder="–">
+      </div>
+
+      <div class="form-nav-row">
+        <button class="btn-back-form" onclick="go('form1')">← Atrás</button>
+        <button class="btn-next-form" onclick="go('form3')">Siguiente →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 3C · FORMULARIO ESPACIO — PASO 3
+══════════════════════════════════════ -->
+<div class="screen" id="s-form3">
+  <div class="form-screen">
+
+    <div class="form-header header-pink">
+      <button class="form-back" onclick="go('form2')">
+        <i class="ph ph-arrow-left"></i> Paso 2
+      </button>
+      <h1 class="form-title">Datos de contacto</h1>
+      <p class="form-subtitle">¿Cómo se comunica la gente con tu espacio?</p>
+    </div>
+
+    <!-- stepper -->
+    <div class="stepper">
+      <div class="step-item">
+        <div class="step-circle done"><i class="ph ph-check" style="font-size:13px"></i></div>
+        <span class="step-label">Datos</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step-item">
+        <div class="step-circle done"><i class="ph ph-check" style="font-size:13px"></i></div>
+        <span class="step-label">Deportes</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step-item">
+        <div class="step-circle active">3</div>
+        <span class="step-label active">Contacto</span>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <div class="field">
+        <label class="field-label">Email de contacto</label>
+        <input class="field-input" type="email" placeholder="contacto@miespacio.com">
+        <span class="field-hint">Este email va a ser visible en tu ficha.</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Teléfono <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input class="field-input" type="tel" placeholder="+54 11 0000 0000">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Instagram <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input class="field-input" type="text" placeholder="@tuespacio">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Sitio web <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></label>
+        <input class="field-input" type="url" placeholder="www.tuespacio.com.ar">
+      </div>
+
+      <div class="form-nav-row">
+        <button class="btn-back-form" onclick="go('form2')">← Atrás</button>
+        <button class="btn-next-form" onclick="go('home')">Enviar →</button>
+      </div>
+
+      <p class="form-footer-note" style="margin-top:20px">
+        Tu espacio va a quedar pendiente de revisión.<br>
+        Te avisamos por email cuando esté publicado en el mapa.
+      </p>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /phone -->
+
+<script>
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.snav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  const map = { home:0, alta:1, form1:2, form2:3, form3:4 };
+  document.querySelectorAll('.snav-btn')[map[id]]?.classList.add('active');
+  document.querySelector('.phone').scrollTop = 0;
+}
+function toggleChip(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+function toggleSport(el) {
+  el.classList.toggle('on');
+}
+</script>
+</body>
+</html>
